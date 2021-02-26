@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserserviceService } from '../services/userservice.service';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
+import {NgxCaptchaModule,ReCaptcha2Component} from 'ngx-captcha';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -13,31 +14,21 @@ export class LoginComponent implements OnInit {
   constructor(private fb:FormBuilder, private userservice:UserserviceService, private route:Router) { 
     this.siteKey="6LeGE2UaAAAAADiYYpJCNEGLd6w11IIbDoQ8zHMx";
   }
-
+  @ViewChild('captchaElem') captchaElem: ReCaptcha2Component;
   //sitio= 6LeGE2UaAAAAADiYYpJCNEGLd6w11IIbDoQ8zHMx
   //servidor=6LeGE2UaAAAAAG7cNxLmyZRLr_hCMtu8VonTudvx
   ngOnInit(): void {
     this.userservice.CheckToken();
   }
   aFormGroup = this.fb.group({
-    email: ['',[Validators.email,Validators.required]],
-    password: ['',Validators.required],
-    recaptcha: ['', Validators.required]
+    email: [null,[Validators.email,Validators.required]],
+    password: [null,Validators.required],
+    recaptcha: [null, Validators.required]
   });
   codigo:string;
   tokencorrecto:string;
- 
+  type: 'image';
   login(){
-    if(this.aFormGroup.get('email').value==""){
-      this.mostrarAlerta('error','Oops...','ingrese su email');
-      
-    }else{
-      if(this.aFormGroup.get('password').value==""){
-        this.mostrarAlerta('error','Oops...','ingrese su contraseña');
-      }else{
-        if (this.aFormGroup.get('recaptcha').value=="") {
-          this.mostrarAlerta('error','Oops...','Confirme si es un humano');
-        } else {
           if(this.aFormGroup.valid){
             Swal.fire({
               title:'Espere',
@@ -68,6 +59,10 @@ export class LoginComponent implements OnInit {
                   } else {
                     this.mostrarAlerta('error','Oops...','Error del servidor');
                   }
+                  this.aFormGroup.reset();
+                  //this.aFormGroup.controls['recaptcha'].setValue(null);
+                  this.captchaElem.resetCaptcha();
+                  //this.route.navigate(['/']);
                 }
                })
               }else{
@@ -76,12 +71,12 @@ export class LoginComponent implements OnInit {
             })
             
           }else{
-            this.mostrarAlerta('error','Oops...','Formato de correo incorrecto');
+            this.mostrarAlerta('error','Oops...','Campos sin completar, su correo es incorrecto o confirme se es un humano');
           }
+          
         }
-      }
-    }
-  }
+  
+  
   
   mostrarAlerta(icon:string,title:string, text:string){ 
       Swal.fire({
