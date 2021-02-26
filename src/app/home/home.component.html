@@ -1,0 +1,13 @@
+<div class="login-page">
+    <div class="form" >    
+        <button type="button" (click)="mostrar()">Mostrar Mis Datos</button> 
+        <br>
+        <br>
+        <strong *ngIf="validar">Nombre: <p>{{datos.name}}</p></strong>
+        <br>
+        <strong *ngIf="validar">Email: <p>{{datos.email}}</p></strong>
+             
+    </div>
+  </div>
+
+  
